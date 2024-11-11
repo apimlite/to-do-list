@@ -1,0 +1,192 @@
+openapi: 3.0.1
+info:
+  title: AWS Marketplace Integration
+  version: "1.0.0"
+  description: AWS Marketplace Integration
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Get the health status of the service
+      responses:
+        '200':
+          description: Returns healthy status
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      tags:
+        - health
+
+  /aws-marketplace/webhook:
+    post:
+      tags:
+        - AWS Webhook
+      summary: AWS Marketplace Webhook
+      description: Webhook for AWS Marketplace customer onboarding
+      operationId: resolveAwsCustomer
+      requestBody:
+        description: Resolve AWS customer
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                x-amzn-marketplace-token:
+                  type: string
+              required:
+                - x-amzn-marketplace-token
+        required: true
+      responses:
+        '200':
+          description: Token processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+
+  /aws-marketplace/onboarding/{customerIdentifier}:
+    get:
+      tags:
+        - Onboarding
+      summary: Retrieve the customer onboarding form
+      description: Fetch the onboarding form for a customer by their identifier.
+      operationId: getCustomerForm
+      parameters:
+        - in: path
+          name: customerIdentifier
+          required: true
+          schema:
+            type: string
+          description: The customer identifier to retrieve the form.
+      responses:
+        '200':
+          description: Returns the customer onboarding form
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "<html>...form content...</html>"
+        '404':
+          description: Customer not found or already registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorTitle:
+                    type: string
+                  errorMessage:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    post:
+      tags:
+        - Onboarding
+      summary: Submit customer onboarding details
+      description: Process the customer details submitted through the onboarding form.
+      operationId: submitCustomerDetails
+      parameters:
+        - in: path
+          name: customerIdentifier
+          required: true
+          schema:
+            type: string
+          description: The customer identifier to submit the details for.
+      requestBody:
+        description: The details of the customer to update.
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                customer_identifier:
+                  type: string
+                  description: Unique identifier for the customer.
+                name:
+                  type: string
+                  description: Full name of the customer.
+                email:
+                  type: string
+                  description: Email address of the customer.
+                phone:
+                  type: string
+                  description: Phone number of the customer.
+                job_role:
+                  type: string
+                  description: Job role of the customer.
+                company:
+                  type: string
+                  description: The company of the customer.
+                country:
+                  type: string
+                  description: The country where the customer resides.
+              required:
+                - customer_identifier
+                - name
+                - email
+                - phone
+                - job_role
+                - company
+                - country
+        required: true
+      responses:
+        '200':
+          description: Customer details updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Customer details updated successfully."
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
