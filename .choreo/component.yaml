@@ -1,11 +1,14 @@
 apiVersion: core.choreo.dev/v1beta1
 kind: ComponentConfig
 spec:
-  schemaVersion: "1.0"  # Replace with the appropriate schema version
+  schemaVersion: 1.0  # Add schemaVersion and remove version
   inbound:
     - name: AWS Marketplace Integration
-      port: 8080
       type: REST
-      networkVisibility: Public
-      context: /
+      endpoints:
+        - service:
+            basePath: "/"                # Copy context to basePath
+            port: 8080                    # Copy port to service.port
+            networkVisibilities:
+              - Public                    # Copy networkVisibility to networkVisibilities
       schemaFilePath: openapi.yaml
