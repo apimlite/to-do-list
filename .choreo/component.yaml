@@ -13,14 +13,3 @@ endpoints:
       - Public                             # Network visibility (Public, Organization, Project)
       - Organization
     schemaFilePath: openapi.yaml          # Path to the API schema (OpenAPI)
-
-  # You can add more endpoints below as needed, for example:
-  # - name: another-endpoint
-  #   displayName: Another API Endpoint
-  #   service:
-  #     basePath: /another-api
-  #     port: 9090
-  #   type: REST
-  #   networkVisibilities:
-  #     - Public
-  #   schemaFilePath: another-api.yaml
