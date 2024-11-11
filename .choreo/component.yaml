@@ -3,8 +3,8 @@ schemaVersion: 1.1  # Specify the version of the component.yaml schema
 # Define the incoming connections (endpoints) for your component
 endpoints:
   # AWS Marketplace Integration endpoint
-  - name: AWS Marketplace Integration
-    displayName: AWS Marketplace API Integration
+  - name: aws
+    displayName: aws
     service:
       basePath: /marketplace-integration   # Base path for the API
       port: 8080                          # Port exposed via the endpoint
