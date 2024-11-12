@@ -153,13 +153,13 @@ func (s *Service) handleMarketplaceToken(c *gin.Context) {
 		return
 	}
 
-	err = s.repo.UpdateCustomerBasicInfo(c.Request.Context(), resolvedCustomer)
+	// err = s.repo.UpdateCustomerBasicInfo(c.Request.Context(), resolvedCustomer)
 
-	if err != nil {
-		s.handleError(c, err)
-		s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Update Customer Info Failed", "errorMessage": "Failed to update customer info."})
-		return
-	}
+	// if err != nil {
+	// 	s.handleError(c, err)
+	// 	s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Update Customer Info Failed", "errorMessage": "Failed to update customer info."})
+	// 	return
+	// }
 
 	getEntitlementReq := GetEntitlementsRequest{
 		CustomerIdentifier: *resolvedCustomer.CustomerIdentifier,
@@ -185,26 +185,26 @@ func (s *Service) handleMarketplaceToken(c *gin.Context) {
 		return
 	}
 
-	err = s.repo.UpdateEntitlements(c.Request.Context(), *entitlements)
+	// err = s.repo.UpdateEntitlements(c.Request.Context(), *entitlements)
 
-	if err != nil {
-		s.handleError(c, err)
-		s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Update Entitlements Failed", "errorMessage": "Failed to update entitlements."})
-		return
-	}
+	// if err != nil {
+	// 	s.handleError(c, err)
+	// 	s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Update Entitlements Failed", "errorMessage": "Failed to update entitlements."})
+	// 	return
+	// }
 
-	res, err := s.repo.CheckCustomerRegistration(c.Request.Context(), getEntitlementReq.CustomerIdentifier)
+	// res, err := s.repo.CheckCustomerRegistration(c.Request.Context(), getEntitlementReq.CustomerIdentifier)
 
-	if err != nil {
-		s.handleError(c, err)
-		s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Check Customer Registration Failed", "errorMessage": "Failed to check customer registration"})
-		return
-	}
+	// if err != nil {
+	// 	s.handleError(c, err)
+	// 	s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Check Customer Registration Failed", "errorMessage": "Failed to check customer registration"})
+	// 	return
+	// }
 
-	if !res.NeedsRegistration {
-		s.handleHTMLResponse(c, "success.tmpl", http.StatusOK, gin.H{})
-		return
-	}
+	// if !res.NeedsRegistration {
+	// 	s.handleHTMLResponse(c, "success.tmpl", http.StatusOK, gin.H{})
+	// 	return
+	// }
 
 	basePath := "zvdz/aws-marketplace-integration/v1.0/"
 	s.logger.Infow("Redirecting to onboarding", basePath)
@@ -245,17 +245,17 @@ func (s *Service) handleCustomerDetails(c *gin.Context) {
 		"customerIdentifier", req.CustomerIdentifier)
 
 	// s.handleHTMLResponse(c, "success.tmpl", http.StatusOK, gin.H{})
-	rws, err := s.repo.CheckCustomerRegistration(c.Request.Context(), req.CustomerIdentifier)
+	// rws, err := s.repo.CheckCustomerRegistration(c.Request.Context(), req.CustomerIdentifier)
 
-	if err != nil {
-		s.handleError(c, err)
-		return
-	}
+	// if err != nil {
+	// 	s.handleError(c, err)
+	// 	return
+	// }
 
-	if !rws.NeedsRegistration {
-		s.handleError(c, errors.New("Customer not found or Already registered"))
-		return
-	}
+	// if !rws.NeedsRegistration {
+	// 	s.handleError(c, errors.New("Customer not found or Already registered"))
+	// 	return
+	// }
 
 	// Convert request to CustomerAdditionalInfo
 	customerInfo := CustomerAdditionalInfo{
@@ -268,24 +268,24 @@ func (s *Service) handleCustomerDetails(c *gin.Context) {
 	}
 
 	// Call repository method to update customer details
-	updateCustomerError := s.repo.UpdateCustomerAdditionalInfo(c.Request.Context(), req.CustomerIdentifier, customerInfo)
-	if updateCustomerError != nil {
-		switch err {
-		case ErrCustomerNotFound:
-			s.logger.Errorw("Customer not found",
-				"customerIdentifier", req.CustomerIdentifier)
-		default:
-			s.logger.Errorw("Failed to update customer details",
-				"customerIdentifier", req.CustomerIdentifier,
-				"error", err.Error())
-		}
-		s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Update Customer Info Failed", "errorMessage": "Failed to update customer info."})
-		return
+	// updateCustomerError := s.repo.UpdateCustomerAdditionalInfo(c.Request.Context(), req.CustomerIdentifier, customerInfo)
+	// if updateCustomerError != nil {
+	// 	switch err {
+	// 	case ErrCustomerNotFound:
+	// 		s.logger.Errorw("Customer not found",
+	// 			"customerIdentifier", req.CustomerIdentifier)
+	// 	default:
+	// 		s.logger.Errorw("Failed to update customer details",
+	// 			"customerIdentifier", req.CustomerIdentifier,
+	// 			"error", err.Error())
+	// 	}
+	// 	s.handleHTMLResponse(c, "error.tmpl", http.StatusInternalServerError, gin.H{"errorTitle": "Update Customer Info Failed", "errorMessage": "Failed to update customer info."})
+	// 	return
 
-	}
+	// }
 
 	s.logger.Infow("Customer details updated successfully",
-		"customerIdentifier", req.CustomerIdentifier)
+		"customerIdentifier", customerInfo)
 	s.handleHTMLResponse(c, "success.tmpl", http.StatusOK, gin.H{})
 }
 
@@ -293,30 +293,34 @@ func (s *Service) handleCustomerDetails(c *gin.Context) {
 func (s *Service) handlerForm(c *gin.Context) {
 	customerIdentifier := c.Param("customerIdentifier")
 	s.logger.Infow("Handling form request", "customerIdentifier", customerIdentifier)
-
-	res, err := s.repo.CheckCustomerRegistration(c.Request.Context(), customerIdentifier)
-	if err != nil {
-		s.handleError(c, err)
-		return
-	}
-	s.logger.Infow("Customer registration status",
-		"customerIdentifier", customerIdentifier,
-		"needsRegistration", res.NeedsRegistration)
-
-	if !res.NeedsRegistration && res.ProductName == "" {
-		s.handleHTMLResponse(c, "error.tmpl", http.StatusNotFound, gin.H{"errorTitle": "Customer Not Found", "errorMessage": "Customer not found."})
-		return
-	}
-
-	if !res.NeedsRegistration {
-		s.handleHTMLResponse(c, "success.tmpl", http.StatusOK, gin.H{})
-		return
-	}
-
-	c.Header("Content-Type", "text/html")
 	c.HTML(http.StatusOK, "index.tmpl",
 		gin.H{
-			"productName":        res.ProductName,
+			"productName":        "asdasd",
 			"customerIdentifier": customerIdentifier,
 		})
+	// res, err := s.repo.CheckCustomerRegistration(c.Request.Context(), customerIdentifier)
+	// if err != nil {
+	// 	s.handleError(c, err)
+	// 	return
+	// }
+	// s.logger.Infow("Customer registration status",
+	// 	"customerIdentifier", customerIdentifier,
+	// 	"needsRegistration", res.NeedsRegistration)
+
+	// if !res.NeedsRegistration && res.ProductName == "" {
+	// 	s.handleHTMLResponse(c, "error.tmpl", http.StatusNotFound, gin.H{"errorTitle": "Customer Not Found", "errorMessage": "Customer not found."})
+	// 	return
+	// }
+
+	// if !res.NeedsRegistration {
+	// 	s.handleHTMLResponse(c, "success.tmpl", http.StatusOK, gin.H{})
+	// 	return
+	// }
+
+	// c.Header("Content-Type", "text/html")
+	// c.HTML(http.StatusOK, "index.tmpl",
+	// 	gin.H{
+	// 		"productName":        res.ProductName,
+	// 		"customerIdentifier": customerIdentifier,
+	// 	})
 }

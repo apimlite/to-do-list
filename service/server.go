@@ -1,8 +1,6 @@
-
 package service
 
 import (
-	"aws-markertplace-integration/db/repo"
 	"context"
 	"errors"
 	"fmt"
@@ -21,16 +19,14 @@ type Service struct {
 	MeteringClient    MeteringClientInterface
 	EntitlementClient EntitlementClientInterface
 	handler           http.Handler
-	repo              repo.Repository
 }
 
-func New(conf aws.Config, port int, logger zap.SugaredLogger, repo repo.Repository) *Service {
+func New(conf aws.Config, port int, logger zap.SugaredLogger) *Service {
 	return &Service{
 		port:              port,
 		logger:            logger.Named("service"),
 		MeteringClient:    marketplacemetering.NewFromConfig(conf),
 		EntitlementClient: marketplaceentitlementservice.NewFromConfig(conf),
-		repo:              repo,
 	}
 }
 
