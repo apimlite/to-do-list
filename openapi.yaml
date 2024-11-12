@@ -5,6 +5,21 @@ info:
   description: AWS Marketplace Integration
 
 paths:
+  /:
+    get:
+      summary: Root endpoint
+      description: Root endpoint of the service
+      responses:
+        '200':
+          description: Returns the root endpoint
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      tags:
+        - root  
   /health:
     get:
       summary: Health check endpoint

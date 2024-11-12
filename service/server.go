@@ -37,7 +37,9 @@ func (s *Service) SetupRouter() {
 	router.Use(func(c *gin.Context) {
 		c.Next()
 	})
-
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
 	router.POST("/aws-marketplace/webhook", s.handleMarketplaceToken)
 	router.POST("/aws-marketplace/onboarding/:customerIdentifier", s.handleCustomerDetails)
 	router.GET("/aws-marketplace/onboarding/:customerIdentifier", s.handlerForm)
